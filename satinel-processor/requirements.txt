@@ -11,3 +11,4 @@ sentinelhub
 segment-geospatial
 torch
 # optional later: ultralytics
+usgs-api

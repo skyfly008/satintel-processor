@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     sentinel_instance_id: str = ""
     sentinel_client_id: str = ""
     sentinel_client_secret: str = ""
+    usgs_api_key: str = ""
 
     class Config:
         env_file = ".env"  # reads from .env
