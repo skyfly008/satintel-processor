@@ -1,7 +1,13 @@
 fastapi
 uvicorn
 pydantic
-pytest
-requests
-pillow
+jinja2
 numpy
+pillow
+rasterio
+geopandas
+shapely
+sentinelhub
+segment-geospatial
+torch
+# optional later: ultralytics
