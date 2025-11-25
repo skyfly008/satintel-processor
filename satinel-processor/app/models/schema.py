@@ -9,9 +9,11 @@ class BuildingStats(BaseModel):
 
 
 class ChangeStats(BaseModel):
-    new: int = 0
-    removed: int = 0
-    activity_score: float = 0.0
+    new: int = 0  # Number of new objects detected
+    removed: int = 0  # Number of removed objects
+    unchanged: int = 0  # Number of objects present in both dates
+    activity_score: float = 0.0  # Overall activity metric (0-100)
+    temporal_change_pct: float = 0.0  # Percentage change in object count
 
 
 class TaskRequest(BaseModel):
@@ -19,7 +21,8 @@ class TaskRequest(BaseModel):
     area_id: Optional[str] = None  # either area_id or lat/lon may be provided
     lat: Optional[float] = None
     lon: Optional[float] = None
-    date: Optional[str] = None
+    date: Optional[str] = None  # Current/target date for analysis
+    historical_date: Optional[str] = None  # Optional: date for temporal comparison
     imagery_source: Optional[str] = None  # e.g. sentinel|usgs|static
 
 

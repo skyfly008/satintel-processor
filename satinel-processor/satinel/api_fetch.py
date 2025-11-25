@@ -162,3 +162,29 @@ def batch_fetch(tasks: List[dict]) -> List[str]:
         t.get('lat'),
         t.get('lon')
     ) for t in tasks]
+
+
+def fetch_historical_pair(
+    area_id: str,
+    date_current: str,
+    date_historical: str,
+    lat: Optional[float] = None,
+    lon: Optional[float] = None
+) -> tuple[str, str]:
+    """Fetch a pair of images for temporal comparison.
+    
+    Args:
+        area_id: Area identifier
+        date_current: Current/target date (e.g., "2023-01-01")
+        date_historical: Historical date for comparison (e.g., "2021-01-01")
+        lat: Optional latitude for point-based fetching
+        lon: Optional longitude for point-based fetching
+    
+    Returns:
+        Tuple of (historical_path, current_path)
+    """
+    path_historical = fetch_dynamic_imagery(area_id, date_historical, lat, lon)
+    path_current = fetch_dynamic_imagery(area_id, date_current, lat, lon)
+    
+    return path_historical, path_current
+
