@@ -6,3 +6,11 @@ __pycache__/
 __pycache__/
 *.pyc
 data/cache/
+
+# Model weights (too big for git - download separately)
+models/*.pth
+*.pth
+
+# Generated test data (can be recreated with scripts)
+data/imagery/AREA_1/*.png
+data/masks/AREA_1/*.npy

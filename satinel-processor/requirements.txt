@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 pydantic
+pydantic-settings
 jinja2
 numpy
 pillow
@@ -10,5 +11,7 @@ shapely
 sentinelhub
 segment-geospatial
 torch
+scipy
+opencv-python-headless
 # optional later: ultralytics
 usgs-api
