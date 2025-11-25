@@ -22,7 +22,7 @@ async def run_tests():
     )
     
     result1 = await process_task(req1)
-    print(f"✅ Task ID: {result1.task_id}")
+    print(f"Task ID: {result1.task_id}")
     print(f"   Status: {result1.status}")
     print(f"   Source: {result1.source}")
     print(f"   Building Stats:")
@@ -41,7 +41,7 @@ async def run_tests():
     )
     
     result2 = await process_task(req2)
-    print(f"✅ Task ID: {result2.task_id}")
+    print(f"Task ID: {result2.task_id}")
     print(f"   Status: {result2.status}")
     print(f"   Source: {result2.source}")
     print(f"   Building Stats:")
@@ -61,21 +61,21 @@ async def run_tests():
     )
     
     result3 = await process_task(req3)
-    print(f"✅ Task ID: {result3.task_id}")
+    print(f"Task ID: {result3.task_id}")
     print(f"   Status: {result3.status}")
     print(f"   Snapped to Area: {result3.results.get('area_id')}")
     print(f"   Building Count: {result3.building_stats.count}")
     
-    print("\n" + "=" * 60)
+    print("=" * 60)
     print("SUMMARY")
     print("=" * 60)
-    print(f"✅ All tests passed successfully!")
-    print(f"\nTemporal Analysis (2021 → 2023):")
+    print(f"All tests passed successfully!")
+    print(f"\nTemporal Analysis (2021 -> 2023):")
     print(f"  Buildings in 2021: {result1.building_stats.count}")
     print(f"  Buildings in 2023: {result2.building_stats.count}")
     print(f"  Change: +{result2.building_stats.count - result1.building_stats.count} buildings")
     print(f"  Area change: +{(result2.building_stats.total_footprint_area - result1.building_stats.total_footprint_area):.0f} m²")
-    print("\n✅ Section 4 implementation verified!")
+    print("\nSection 4 implementation verified!")
 
 # Run async tests
 asyncio.run(run_tests())

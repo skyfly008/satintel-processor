@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from .routers.satinel import router as sat_router
@@ -13,7 +13,7 @@ app.include_router(sat_router, prefix="/api")
 
 
 @app.get("/")
-async def index(request):
+async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
