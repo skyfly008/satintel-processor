@@ -103,8 +103,13 @@ def generate_overlay(
 ) -> str:
     """Generate overlay visualization with detected objects and changes.
     
-    Single-date mode: draws red semi-transparent polygons for all detections.
+    Single-date mode: draws yellow semi-transparent polygons for all detections.
     Temporal mode: draws green for new objects, red for removed, yellow for unchanged.
+    
+    Color scheme:
+    - Yellow (255,255,0): All buildings/infrastructure in single-date mode or unchanged
+    - Green (0,255,0): New buildings detected (added since historical)
+    - Red (255,0,0): Removed buildings (present in historical, gone in current)
     
     Returns path to saved overlay PNG.
     """
@@ -112,24 +117,32 @@ def generate_overlay(
     if img.mode != 'RGB':
         img = img.convert('RGB')
     
-    # Create overlay layer
+    # Create overlay layer with transparency
     overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
+    draw = ImageDraw.Draw(overlay, 'RGBA')
     
     if change_polygons is None:
-        # Single-date mode: draw all detections in red
+        # Single-date mode: draw all detections in yellow
         for det in detections:
-            _draw_polygon(draw, det, color=(255, 0, 0, 100))
+            _draw_polygon(draw, det, color=(255, 255, 0, 128))  # Yellow, 50% opacity
     else:
         # Temporal mode: color-code by change type
-        for det in change_polygons.get('new', []):
-            _draw_polygon(draw, det, color=(0, 255, 0, 120))  # green for new
+        # Draw in order: unchanged (yellow) first, then new (green), then removed (red) on top
         
-        for det in change_polygons.get('removed', []):
-            _draw_polygon(draw, det, color=(255, 0, 0, 120))  # red for removed
+        # 1. Yellow for unchanged buildings (base layer)
+        unchanged = change_polygons.get('unchanged', [])
+        for det in unchanged:
+            _draw_polygon(draw, det, color=(255, 255, 0, 100))  # Yellow, more transparent
         
-        for det in change_polygons.get('unchanged', []):
-            _draw_polygon(draw, det, color=(255, 255, 0, 80))  # yellow for unchanged
+        # 2. Green for new buildings (highlight growth)
+        new = change_polygons.get('new', [])
+        for det in new:
+            _draw_polygon(draw, det, color=(0, 255, 0, 150))  # Bright green, more opaque
+        
+        # 3. Red for removed buildings (highlight demolition/change)
+        removed = change_polygons.get('removed', [])
+        for det in removed:
+            _draw_polygon(draw, det, color=(255, 0, 0, 150))  # Bright red, more opaque
     
     # Composite overlay onto base image
     img_rgba = img.convert('RGBA')
@@ -149,7 +162,13 @@ def generate_overlay(
 
 
 def _draw_polygon(draw: ImageDraw.ImageDraw, detection: dict, color: tuple):
-    """Helper to draw a single polygon from detection dict."""
+    """Helper to draw a single polygon from detection dict.
+    
+    Args:
+        draw: PIL ImageDraw object
+        detection: Detection dict with 'geometry' or 'bbox'
+        color: RGBA tuple (R, G, B, Alpha) for fill color
+    """
     from shapely.geometry import Polygon
     
     geometry = detection.get('geometry')
@@ -159,7 +178,9 @@ def _draw_polygon(draw: ImageDraw.ImageDraw, detection: dict, color: tuple):
         if bbox:
             minc, minr, maxc, maxr = bbox
             coords = [(minc, minr), (maxc, minr), (maxc, maxr), (minc, maxr)]
-            draw.polygon(coords, fill=color, outline=(color[0], color[1], color[2], 255))
+            # Draw with solid outline
+            outline_color = (color[0], color[1], color[2], 255)
+            draw.polygon(coords, fill=color, outline=outline_color, width=2)
         return
     
     # Handle Shapely geometry
@@ -168,5 +189,7 @@ def _draw_polygon(draw: ImageDraw.ImageDraw, detection: dict, color: tuple):
         # Convert to pixel coordinates (already in pixel space)
         pixel_coords = [(x, y) for x, y in coords]
         if len(pixel_coords) >= 3:
-            draw.polygon(pixel_coords, fill=color, outline=(color[0], color[1], color[2], 255))
+            # Draw with slightly more visible outline
+            outline_color = (color[0], color[1], color[2], 255)
+            draw.polygon(pixel_coords, fill=color, outline=outline_color, width=2)
 
