@@ -15,6 +15,10 @@ async def process_task(req: TaskRequest) -> TaskResponse:
     2. Fetch or fallback to static imagery path
     3. Load image and compute dummy stats (pixel dimensions -> area proxy)
     4. Return TaskResponse with placeholder BuildingStats and ChangeStats
+    
+    Supports mode via req.imagery_source:
+    - 'dynamic': Try Sentinel/USGS live fetch with cache
+    - 'static' or None: Use pre-stored imagery
     """
     # Resolve area
     area_id = req.area_id
@@ -22,9 +26,15 @@ async def process_task(req: TaskRequest) -> TaskResponse:
         area_id = snap_to_aoi_tile(req.lon, req.lat) or "AREA_1"  # default fallback
 
     date = req.date or "2023-01-01"
+    mode = req.imagery_source or "static"
 
-    # Fetch imagery path (Sentinel/USGS/static fallback handled in fetch_dynamic_imagery)
-    path = fetch_dynamic_imagery(area_id, date)
+    # Fetch imagery path
+    if mode == "dynamic":
+        # Pass lat/lon to fetch_dynamic_imagery for 512x512 clips around point
+        path = fetch_dynamic_imagery(area_id, date, lat=req.lat, lon=req.lon)
+    else:
+        # Static mode: use pre-stored imagery (or fetch without lat/lon for AOI-based)
+        path = fetch_dynamic_imagery(area_id, date)
 
     width = height = 0
     try:
@@ -47,6 +57,7 @@ async def process_task(req: TaskRequest) -> TaskResponse:
     results = {
         "area_id": area_id,
         "date": date,
+        "mode": mode,
         "pixel_width": width,
         "pixel_height": height,
         "pixel_area": pixel_area,
@@ -57,7 +68,7 @@ async def process_task(req: TaskRequest) -> TaskResponse:
     return TaskResponse(
         task_id=task_id,
         status="done",
-        source=req.imagery_source,  # optionally set by caller
+        source=mode,
         building_stats=building_stats,
         change_stats=change_stats,
         results=results,
