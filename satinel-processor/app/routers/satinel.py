@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import List
-from ..models.schema import TaskRequest, TaskResponse, BatchRequest
+from ..models.schema import TaskRequest, TaskResponse, BatchRequest, BatchResponse
 from ..services import analysis
 
 router = APIRouter()
@@ -12,8 +12,8 @@ async def api_task(req: TaskRequest):
     return res
 
 
-@router.post("/batch_task", response_model=List[TaskResponse])
-async def api_batch_task(req: BatchRequest, background_tasks: BackgroundTasks):
-    # queue batch processing and return immediately
-    background_tasks.add_task(analysis.process_batch, req)
-    return [TaskResponse(task_id=str(i), status="queued") for i, _ in enumerate(req.tasks)]
+@router.post("/batch_task", response_model=BatchResponse)
+async def api_batch_task(req: BatchRequest):
+    """Execute batch analysis with parallel processing and aggregated results."""
+    result = await analysis.process_batch(req)
+    return result

@@ -24,6 +24,7 @@ class TaskRequest(BaseModel):
     date: Optional[str] = None
     historical_date: Optional[str] = None  # for temporal comparison
     imagery_source: Optional[str] = None  # sentinel, usgs, or static
+    prompt: Optional[str] = None  # custom detection prompt (e.g., "vehicles", "solar panels")
 
 
 class BatchRequest(BaseModel):
@@ -38,3 +39,14 @@ class TaskResponse(BaseModel):
     change_stats: Optional[ChangeStats] = None
     overlay_url: Optional[str] = None
     results: Optional[Dict] = None
+
+
+class BatchResponse(BaseModel):
+    batch_id: str
+    status: str
+    total_tasks: int
+    completed: int
+    failed: int
+    aggregate_stats: Optional[Dict] = None  # total detections, hotspots, etc.
+    task_results: List[TaskResponse] = []
+

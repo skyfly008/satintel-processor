@@ -4,7 +4,7 @@ from typing import List, Optional
 from PIL import Image
 import numpy as np
 
-from ..models.schema import TaskRequest, TaskResponse, BatchRequest, BuildingStats, ChangeStats
+from ..models.schema import TaskRequest, TaskResponse, BatchRequest, BuildingStats, ChangeStats, BatchResponse
 from satinel.api_fetch import fetch_dynamic_imagery, fetch_historical_pair
 from satinel.imagery_io import load_image, generate_overlay
 from satinel.data_config import snap_to_aoi_tile, get_aoi
@@ -44,6 +44,7 @@ async def process_task(req: TaskRequest) -> TaskResponse:
     date = req.date or "2023-01-01"
     historical_date = req.historical_date
     mode = req.imagery_source or "static"
+    prompt = req.prompt or "buildings infrastructure"
 
     is_temporal = historical_date is not None
     
@@ -89,7 +90,7 @@ async def process_task(req: TaskRequest) -> TaskResponse:
             # Run SAM detection
             detections = detect_objects(
                 img_path,
-                prompt="buildings infrastructure",
+                prompt=prompt,
                 automatic=True,
                 min_area=10.0,
             )
@@ -204,9 +205,81 @@ async def process_task(req: TaskRequest) -> TaskResponse:
     )
 
 
-async def process_batch(req: BatchRequest) -> List[TaskResponse]:
+async def process_batch(req: BatchRequest) -> BatchResponse:
+    """Process multiple tasks in parallel and aggregate results.
+    Returns BatchResponse with individual task results and aggregated statistics.
+    """
+    import time
+    import uuid
+    
+    batch_id = f"batch_{uuid.uuid4().hex[:8]}"
+    start_time = time.time()
+    
+    # Execute all tasks in parallel
     tasks = [process_task(t) for t in req.tasks]
-    return await asyncio.gather(*tasks)
+    task_results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    # Separate successful and failed tasks
+    completed_tasks = []
+    failed_count = 0
+    
+    for i, result in enumerate(task_results):
+        if isinstance(result, Exception):
+            failed_count += 1
+            # Create error response
+            completed_tasks.append(TaskResponse(
+                task_id=f"task_{i}",
+                status="error",
+                results={"error": str(result)}
+            ))
+        else:
+            completed_tasks.append(result)
+    
+    # Aggregate statistics
+    total_detections = 0
+    total_new = 0
+    total_removed = 0
+    total_area = 0.0
+    hotspots = []  # areas with high activity
+    
+    for task in completed_tasks:
+        if task.status == "done" and task.building_stats:
+            total_detections += task.building_stats.count
+            total_area += task.building_stats.total_footprint_area
+            
+            if task.change_stats:
+                total_new += task.change_stats.new
+                total_removed += task.change_stats.removed
+                
+                # Identify hotspots (high activity score)
+                if task.change_stats.activity_score > 70:
+                    hotspots.append({
+                        "task_id": task.task_id,
+                        "activity_score": task.change_stats.activity_score,
+                        "area_id": task.results.get("area_id") if task.results else None
+                    })
+    
+    elapsed_time = time.time() - start_time
+    
+    aggregate_stats = {
+        "total_detections": total_detections,
+        "total_area_m2": total_area,
+        "total_new": total_new,
+        "total_removed": total_removed,
+        "hotspots": hotspots,
+        "processing_time_seconds": round(elapsed_time, 2),
+        "avg_detections_per_task": round(total_detections / len(completed_tasks), 1) if completed_tasks else 0
+    }
+    
+    return BatchResponse(
+        batch_id=batch_id,
+        status="completed",
+        total_tasks=len(req.tasks),
+        completed=len(completed_tasks) - failed_count,
+        failed=failed_count,
+        aggregate_stats=aggregate_stats,
+        task_results=completed_tasks
+    )
 
 
 def process_task_coords(lat: float, lon: float, date: Optional[str] = None) -> TaskResponse:

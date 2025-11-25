@@ -1,4 +1,5 @@
 ﻿from typing import List, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from app.config import settings
 
 try:
@@ -150,14 +151,37 @@ def fetch_dynamic_imagery(area_id: str, date: str, lat: Optional[float] = None, 
     return str(static_path)
 
 
-def batch_fetch(tasks: List[dict]) -> List[str]:
-    """Batch fetch with optional lat/lon per task."""
-    return [fetch_dynamic_imagery(
-        t.get('area_id', 'AREA_1'),
-        t.get('date', '2023-01-01'),
-        t.get('lat'),
-        t.get('lon')
-    ) for t in tasks]
+def batch_fetch(tasks: List[dict], max_workers: int = 4) -> List[str]:
+    """Parallel batch fetch using ThreadPoolExecutor.
+    Each task dict should have: area_id, date, lat (optional), lon (optional).
+    Returns list of image paths in same order as tasks.
+    """
+    results = [None] * len(tasks)
+    
+    def fetch_task(idx: int, task: dict) -> tuple:
+        try:
+            path = fetch_dynamic_imagery(
+                task.get('area_id', 'AREA_1'),
+                task.get('date', '2023-01-01'),
+                task.get('lat'),
+                task.get('lon')
+            )
+            return (idx, path, None)
+        except Exception as e:
+            return (idx, None, str(e))
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(fetch_task, i, t): i for i, t in enumerate(tasks)}
+        
+        for future in as_completed(futures):
+            idx, path, error = future.result()
+            if error:
+                print(f"Task {idx} fetch failed: {error}")
+                results[idx] = None
+            else:
+                results[idx] = path
+    
+    return results
 
 
 def fetch_historical_pair(
