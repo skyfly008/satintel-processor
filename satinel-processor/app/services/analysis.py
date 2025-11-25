@@ -6,7 +6,7 @@ import numpy as np
 
 from ..models.schema import TaskRequest, TaskResponse, BatchRequest, BuildingStats, ChangeStats
 from satinel.api_fetch import fetch_dynamic_imagery, fetch_historical_pair
-from satinel.imagery_io import load_image
+from satinel.imagery_io import load_image, generate_overlay
 from satinel.data_config import snap_to_aoi_tile, get_aoi
 from satinel.object_model import detect_objects
 from satinel.change_detection import compute_change_stats, compute_change_from_masks
@@ -124,6 +124,18 @@ async def process_task(req: TaskRequest) -> TaskResponse:
             
             building_stats = compute_building_stats(detections_current, aoi_area_km2)
             
+            # Generate temporal overlay with color-coded changes
+            change_polygons = {
+                'new': change_dict.get('new_objects', []),
+                'removed': change_dict.get('removed_objects', []),
+                'unchanged': change_dict.get('matched_objects', [])
+            }
+            overlay_path = generate_overlay(
+                path_current,
+                detections_current,
+                change_polygons=change_polygons
+            )
+            
             results = {
                 "area_id": area_id,
                 "date": date,
@@ -152,6 +164,9 @@ async def process_task(req: TaskRequest) -> TaskResponse:
             
             building_stats = compute_building_stats(detections, aoi_area_km2)
             
+            # Generate single-date overlay (all detections in red)
+            overlay_path = generate_overlay(path, detections)
+            
             results = {
                 "area_id": area_id,
                 "date": date,
@@ -167,6 +182,7 @@ async def process_task(req: TaskRequest) -> TaskResponse:
         import traceback
         traceback.print_exc()
         
+        overlay_path = None
         results = {
             "area_id": area_id,
             "date": date,
@@ -183,6 +199,7 @@ async def process_task(req: TaskRequest) -> TaskResponse:
         source=mode,
         building_stats=building_stats,
         change_stats=change_stats,
+        overlay_url=overlay_path,
         results=results,
     )
 

@@ -36,4 +36,5 @@ class TaskResponse(BaseModel):
     source: Optional[str] = None
     building_stats: Optional[BuildingStats] = None
     change_stats: Optional[ChangeStats] = None
+    overlay_url: Optional[str] = None
     results: Optional[Dict] = None
