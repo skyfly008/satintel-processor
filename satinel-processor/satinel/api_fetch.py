@@ -35,7 +35,7 @@ def _build_sh_config():
 
 
 def _bbox_around_point(lon: float, lat: float, size_deg: float = 0.01) -> list:
-    """Create a bbox [min_lon, min_lat, max_lon, max_lat] around a point (~1km at equator)."""
+    """Create bbox around point (~1km at equator)."""
     half = size_deg / 2
     return [lon - half, lat - half, lon + half, lat + half]
 
@@ -53,11 +53,7 @@ def _save_remote_to(path: Path, url: str):
 
 
 def fetch_dynamic_imagery(area_id: str, date: str, lat: Optional[float] = None, lon: Optional[float] = None) -> str:
-    """Fetch imagery dynamically (Sentinel Hub -> USGS -> static fallback).
-    
-    If lat/lon provided, fetch 512x512 clip around that point.
-    Otherwise use AOI bbox.
-    
+    """Fetch imagery from Sentinel Hub -> USGS -> static fallback.
     Returns path to cached PNG.
     """
     static_path = Path(f"data/imagery/{area_id}/{date}.png")
@@ -171,17 +167,8 @@ def fetch_historical_pair(
     lat: Optional[float] = None,
     lon: Optional[float] = None
 ) -> tuple[str, str]:
-    """Fetch a pair of images for temporal comparison.
-    
-    Args:
-        area_id: Area identifier
-        date_current: Current/target date (e.g., "2023-01-01")
-        date_historical: Historical date for comparison (e.g., "2021-01-01")
-        lat: Optional latitude for point-based fetching
-        lon: Optional longitude for point-based fetching
-    
-    Returns:
-        Tuple of (historical_path, current_path)
+    """Fetch image pair for temporal comparison.
+    Returns (historical_path, current_path).
     """
     path_historical = fetch_dynamic_imagery(area_id, date_historical, lat, lon)
     path_current = fetch_dynamic_imagery(area_id, date_current, lat, lon)

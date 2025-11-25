@@ -33,21 +33,7 @@ def detect_objects(
     automatic: bool = True,
     min_area: float = 10.0,
 ) -> List[Dict]:
-    """
-    Detect objects in satellite imagery using SAM (Segment Anything Model).
-
-    Args:
-        image_path: Path to input image (PNG, JPEG, or GeoTIFF)
-        prompt: Text description of objects to detect (only used with automatic=False)
-        model_type: SAM model variant ('vit_h', 'vit_l', 'vit_b')
-        checkpoint: Path to SAM weights file (optional, uses default if None)
-        return_type: 'polygons' returns Shapely objects, 'mask' returns binary array
-        automatic: Use automatic segmentation (True) or text prompts (False)
-        min_area: Minimum polygon area to filter small detections (pixels)
-
-    Returns:
-        List of detection dictionaries with 'geometry' (Shapely polygon), 'area', 'bbox'
-    """
+    """Detect objects using SAM automatic segmentation."""
     if SamGeo is None:
         return []
     
@@ -67,12 +53,12 @@ def detect_objects(
     output_mask = image_path.parent / f"{image_path.stem}_sam_mask.tif"
     
     try:
-        # Initialize SamGeo with adjusted parameters for building detection
+        # Initialize SAM with tuned parameters for building detection
         sam_kwargs = {
             "points_per_side": 32,
-            "pred_iou_thresh": 0.80,  # Lowered from 0.86 for more detections
-            "stability_score_thresh": 0.85,  # Lowered from 0.92 for more detections
-            "min_mask_region_area": 25,  # Filter very small regions
+            "pred_iou_thresh": 0.80,
+            "stability_score_thresh": 0.85,
+            "min_mask_region_area": 25,
         } if automatic else None
         
         sam = SamGeo(
@@ -143,18 +129,7 @@ def precompute_masks(
     checkpoint: Optional[str] = None,
     automatic: bool = True,
 ) -> Optional[np.ndarray]:
-    """Precompute and save masks for an image.
-    
-    Args:
-        image_path: Path to input image
-        output_path: Path to save .npy mask file
-        prompt: Detection prompt (for non-automatic mode)
-        checkpoint: SAM checkpoint path
-        automatic: Use automatic segmentation
-    
-    Returns:
-        Combined mask array or None if detection failed
-    """
+    """Precompute and save detection masks as .npy file."""
     detections = detect_objects(
         image_path,
         prompt=prompt,

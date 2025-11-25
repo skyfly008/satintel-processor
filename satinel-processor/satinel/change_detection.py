@@ -1,4 +1,4 @@
-"""Change detection module for temporal analysis of satellite imagery"""
+"""Temporal change detection for satellite imagery analysis."""
 from typing import Dict, List, Tuple
 import numpy as np
 from shapely.geometry import Polygon, MultiPolygon
@@ -11,20 +11,10 @@ def compute_change_stats(
     detections_after: List[Dict],
     iou_threshold: float = 0.3
 ) -> Dict:
-    """Compute change statistics between two sets of detections.
+    """Compare detections between two dates using IoU matching.
     
-    Args:
-        detections_before: List of detection dicts from historical date (with 'geometry' key)
-        detections_after: List of detection dicts from current date (with 'geometry' key)
-        iou_threshold: IoU threshold for matching objects (default 0.3)
-    
-    Returns:
-        Dictionary with change statistics:
-        - new: Count of new objects
-        - removed: Count of removed objects
-        - unchanged: Count of matched objects
-        - activity_score: Overall activity metric (0-100)
-        - temporal_change_pct: Percentage change
+    Matches objects between dates based on geometric overlap (IoU).
+    Computes new, removed, and unchanged object counts plus activity metrics.
     """
     if not detections_before and not detections_after:
         return {
@@ -111,14 +101,8 @@ def compute_change_stats(
 
 
 def compute_mask_diff(mask_before: np.ndarray, mask_after: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Compute pixel-level differences between two binary masks.
-    
-    Args:
-        mask_before: Binary mask from historical date (H x W)
-        mask_after: Binary mask from current date (H x W)
-    
-    Returns:
-        Tuple of (new_mask, removed_mask, unchanged_mask)
+    """Pixel-level diff between two binary masks.
+    Returns (new_mask, removed_mask, unchanged_mask).
     """
     # Ensure binary masks
     mask_before = (mask_before > 0).astype(np.uint8)
@@ -137,16 +121,7 @@ def compute_change_from_masks(
     mask_after: np.ndarray,
     min_object_size: int = 10
 ) -> Dict:
-    """Compute change statistics from binary masks using connected components.
-    
-    Args:
-        mask_before: Binary mask from historical date
-        mask_after: Binary mask from current date
-        min_object_size: Minimum pixels for an object
-    
-    Returns:
-        Change statistics dictionary
-    """
+    """Compute change stats from masks using connected components."""
     new_mask, removed_mask, unchanged_mask = compute_mask_diff(mask_before, mask_after)
     
     # Count objects using connected components

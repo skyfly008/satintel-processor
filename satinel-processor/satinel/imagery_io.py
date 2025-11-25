@@ -11,7 +11,7 @@ except ImportError:
 
 
 def load_image(path: str) -> Image.Image:
-    """Load image from path (PNG, JPEG, or GeoTIFF)."""
+    """Load PNG, JPEG, or GeoTIFF image."""
     p = Path(path)
     if not p.exists():
         raise FileNotFoundError(path)
@@ -36,11 +36,7 @@ def load_image(path: str) -> Image.Image:
 
 
 def load_image_and_mask(image_path: str, mask_path: Optional[str] = None) -> Tuple[np.ndarray, Optional[np.ndarray]]:
-    """Load image as numpy array and optionally load mask.
-    
-    Returns:
-        (image_array, mask_array or None)
-    """
+    """Load image and optional mask as numpy arrays."""
     img = load_image(image_path)
     img_arr = np.array(img)
     
@@ -52,7 +48,7 @@ def load_image_and_mask(image_path: str, mask_path: Optional[str] = None) -> Tup
 
 
 def save_overlay(img: Image.Image, outpath: str):
-    """Save overlay image to path (PNG)."""
+    """Save overlay image as PNG."""
     p = Path(outpath)
     p.parent.mkdir(parents=True, exist_ok=True)
     img.save(p)
@@ -95,5 +91,5 @@ def load_mask(path: str) -> np.ndarray:
 
 
 def get_overlay_url(image_path: str) -> str:
-    """Get URL or path for overlay visualization (stub for now)."""
+    """Get path for overlay visualization."""
     return image_path
