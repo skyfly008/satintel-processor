@@ -1,0 +1,331 @@
+/* ASIP Main Stylesheet - Mission-style dashboard */
+
+:root {
+    /* Color scheme - Military/Intelligence aesthetic */
+    --primary-bg: #0a0e1a;
+    --secondary-bg: #151b2d;
+    --card-bg: #1a2332;
+    --accent-blue: #00a3ff;
+    --accent-green: #00ff9f;
+    --accent-red: #ff3366;
+    --accent-yellow: #ffd700;
+    --text-primary: #e8edf4;
+    --text-secondary: #a0aec0;
+    --border-color: #2d3748;
+    
+    /* Spacing */
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    
+    /* Typography */
+    --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'Courier New', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--primary-bg);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+#app-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+header {
+    background: var(--secondary-bg);
+    border-bottom: 2px solid var(--accent-blue);
+    padding: var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content h1 {
+    font-size: 1.8em;
+    color: var(--accent-blue);
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+}
+
+.header-controls {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+#coord-input {
+    padding: 10px 15px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+    width: 300px;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+.btn-primary {
+    padding: 10px 24px;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: #0088cc;
+}
+
+/* Main content */
+#main-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+#map-panel {
+    flex: 1;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+#map-overlay-info {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 35, 50, 0.95);
+    padding: var(--spacing-md);
+    border-radius: 8px;
+    border: 1px solid var(--accent-blue);
+    text-align: center;
+    z-index: 1000;
+}
+
+#map-overlay-info p {
+    margin-bottom: 8px;
+}
+
+#map-overlay-info .small {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+/* Results panel */
+#results-panel {
+    width: 450px;
+    background: var(--secondary-bg);
+    border-left: 2px solid var(--border-color);
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+}
+
+#idle-state {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.idle-message {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.idle-message h3 {
+    color: var(--accent-blue);
+    margin-bottom: var(--spacing-md);
+}
+
+.idle-message ul {
+    list-style: none;
+    margin-top: var(--spacing-md);
+}
+
+.idle-message li {
+    margin: var(--spacing-sm) 0;
+}
+
+/* Loading state */
+#loading-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Results content */
+#results-content h3 {
+    color: var(--accent-blue);
+    margin-bottom: var(--spacing-md);
+    font-size: 1.2em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-sm);
+}
+
+#image-section,
+#stats-section,
+#change-section,
+#metadata-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.image-container {
+    background: var(--card-bg);
+    padding: var(--spacing-sm);
+    border-radius: 4px;
+}
+
+.image-container label {
+    display: block;
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.image-container img {
+    width: 100%;
+    border-radius: 4px;
+}
+
+/* Stats grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+    border-left: 3px solid var(--accent-blue);
+}
+
+.stat-card.stat-new {
+    border-left-color: var(--accent-green);
+}
+
+.stat-card.stat-removed {
+    border-left-color: var(--accent-red);
+}
+
+.stat-card.stat-change {
+    border-left-color: var(--accent-yellow);
+}
+
+.stat-card.stat-activity {
+    border-left-color: var(--accent-blue);
+}
+
+.stat-label {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+}
+
+/* Change info */
+.change-info {
+    background: var(--card-bg);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 4px;
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9em;
+}
+
+.change-info span {
+    color: var(--accent-green);
+    font-weight: 600;
+}
+
+/* Metadata */
+.metadata-grid {
+    background: var(--card-bg);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+}
+
+.metadata-item {
+    font-size: 0.85em;
+}
+
+.meta-label {
+    color: var(--text-secondary);
+    margin-right: 8px;
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+/* Scrollbar styling */
+#results-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+#results-panel::-webkit-scrollbar-track {
+    background: var(--primary-bg);
+}
+
+#results-panel::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+#results-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
+}

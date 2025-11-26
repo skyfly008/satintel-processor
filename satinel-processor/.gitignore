@@ -1,16 +1,74 @@
-venv/
+# Python
 __pycache__/
-*.pyc
-# Ignore local env and caches
-.env
-__pycache__/
-*.pyc
-data/cache/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
 
-# Model weights (too big for git - download separately)
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment variables (CRITICAL - contains API keys)
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Data (large files - don't commit to git)
+data/imagery/**/*.png
+data/imagery/**/*.tif
+data/masks/**/*.npy
+data/masks/**/*.png
+data/cache/**/*.png
+data/cache/**/*.npy
+
+# Model weights (large files)
 models/*.pth
+models/*.pt
+models/*.onnx
 *.pth
 
-# Generated test data (can be recreated with scripts)
-data/imagery/AREA_1/*.png
-data/masks/AREA_1/*.npy
+# Keep directory structure but ignore contents
+!data/imagery/.gitkeep
+!data/masks/.gitkeep
+!data/cache/.gitkeep
+!data/metadata/.gitkeep
+
+# Test outputs
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Static file outputs (generated overlays)
+static/overlays/**/*.png
+static/imagery/**/*.png
+
+# Temporary files
+*.tmp
+*.bak

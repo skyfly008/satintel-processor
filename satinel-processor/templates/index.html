@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASIP - Automated Satellite Intelligence Processor</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <h1>🛰️ ASIP</h1>
+                <p class="subtitle">Automated Satellite Intelligence Processor</p>
+            </div>
+            <div class="header-controls">
+                <input type="text" id="coord-input" placeholder="Enter lat, lon or click map">
+                <button id="task-btn" class="btn-primary">Task Satellite</button>
+            </div>
+        </header>
+
+        <!-- Main content area -->
+        <div id="main-content">
+            <!-- Left panel - Interactive Map -->
+            <div id="map-panel">
+                <div id="map"></div>
+                <div id="map-overlay-info" class="hidden">
+                    <p>Click anywhere on the map or enter coordinates</p>
+                    <p class="small">Available areas: New York, Tehran</p>
+                </div>
+            </div>
+
+            <!-- Right panel - Analysis Results -->
+            <div id="results-panel">
+                <div id="loading-state" class="hidden">
+                    <div class="spinner"></div>
+                    <p>Analyzing imagery...</p>
+                </div>
+
+                <div id="results-content" class="hidden">
+                    <!-- Image comparison -->
+                    <div id="image-section">
+                        <h3>Satellite Imagery</h3>
+                        <div class="image-grid">
+                            <div class="image-container">
+                                <label>Base Image</label>
+                                <img id="base-image" alt="Satellite imagery">
+                            </div>
+                            <div class="image-container">
+                                <label>Building Detection</label>
+                                <img id="overlay-image" alt="Building overlay">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics cards -->
+                    <div id="stats-section">
+                        <h3>Analysis Results</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Buildings Detected</div>
+                                <div class="stat-value" id="building-count">--</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Built Area</div>
+                                <div class="stat-value" id="built-area">-- km²</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Density</div>
+                                <div class="stat-value" id="density">-- per km²</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Avg Building Size</div>
+                                <div class="stat-value" id="avg-size">-- m²</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Change detection -->
+                    <div id="change-section" class="hidden">
+                        <h3>Change Detection</h3>
+                        <div class="change-info">
+                            <p>Compared to: <span id="compared-date">--</span></p>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card stat-new">
+                                <div class="stat-label">New Buildings</div>
+                                <div class="stat-value" id="new-buildings">--</div>
+                            </div>
+                            <div class="stat-card stat-removed">
+                                <div class="stat-label">Removed Buildings</div>
+                                <div class="stat-value" id="removed-buildings">--</div>
+                            </div>
+                            <div class="stat-card stat-change">
+                                <div class="stat-label">Change %</div>
+                                <div class="stat-value" id="percent-change">--%</div>
+                            </div>
+                            <div class="stat-card stat-activity">
+                                <div class="stat-label">Activity Score</div>
+                                <div class="stat-value" id="activity-score">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metadata -->
+                    <div id="metadata-section">
+                        <div class="metadata-grid">
+                            <div class="metadata-item">
+                                <span class="meta-label">Area:</span>
+                                <span id="meta-area">--</span>
+                            </div>
+                            <div class="metadata-item">
+                                <span class="meta-label">Date:</span>
+                                <span id="meta-date">--</span>
+                            </div>
+                            <div class="metadata-item">
+                                <span class="meta-label">Resolution:</span>
+                                <span id="meta-resolution">-- m/pixel</span>
+                            </div>
+                            <div class="metadata-item">
+                                <span class="meta-label">Processing Time:</span>
+                                <span id="meta-time">-- ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="idle-state">
+                    <div class="idle-message">
+                        <h3>🛰️ Ready for Tasking</h3>
+                        <p>Click on the map or enter coordinates to analyze satellite imagery</p>
+                        <ul>
+                            <li>Automated building detection</li>
+                            <li>Area statistics & metrics</li>
+                            <li>Change detection over time</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/static/js/map.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

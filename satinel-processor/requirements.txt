@@ -1,17 +1,36 @@
-fastapi
-uvicorn
-pydantic
-pydantic-settings
-jinja2
-numpy
-pillow
-rasterio
-geopandas
-shapely
-sentinelhub
-segment-geospatial
-torch
-scipy
-opencv-python-headless
-# optional later: ultralytics
-usgs-api
+# Core dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+jinja2==3.1.2
+
+# Image processing & Computer Vision
+numpy==1.24.3
+opencv-python==4.8.1.78
+Pillow==10.1.0
+scikit-image==0.22.0
+
+# Deep Learning (PyTorch - for building detection models)
+torch==2.1.0
+torchvision==0.16.0
+
+# Geospatial
+# TODO: Add when implementing Sentinel/USGS API integration
+# sentinelsat==1.2.1
+# rasterio==1.3.9
+# shapely==2.0.2
+# geopandas==0.14.1
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.1
+
+# Development
+black==23.11.0
+flake8==6.1.0
