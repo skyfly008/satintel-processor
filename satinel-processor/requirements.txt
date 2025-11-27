@@ -15,10 +15,11 @@ scikit-image==0.22.0
 torch==2.1.0
 torchvision==0.16.0
 
-# Geospatial
-# TODO: Add when implementing Sentinel/USGS API integration
+# Geospatial & Satellite Data
+sentinelhub==3.9.0
+landsatxplore==0.14.0
+rasterio==1.3.9
 # sentinelsat==1.2.1
-# rasterio==1.3.9
 # shapely==2.0.2
 # geopandas==0.14.1
 

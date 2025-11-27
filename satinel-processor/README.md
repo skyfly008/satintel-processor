@@ -138,10 +138,17 @@ satinel-processor/
    # Edit .env with your API keys
    ```
 
-5. **Download sample imagery** (TODO: Create download script)
+5. **Download satellite imagery**
    ```bash
-   python scripts/download_sample_data.py
+   # Quick setup (recommended - runs all steps)
+   scripts\setup_complete.bat
+   
+   # Or step-by-step:
+   scripts\test_api.bat              # Test API connection
+   scripts\run_download.bat          # Download imagery
    ```
+   
+   See [QUICKSTART_DOWNLOAD.md](QUICKSTART_DOWNLOAD.md) for detailed instructions.
 
 ### Running the Application
 
